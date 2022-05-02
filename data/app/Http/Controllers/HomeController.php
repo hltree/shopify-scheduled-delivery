@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use PHPShopify\ShopifySDK;
 
-class CsvController extends Controller
+class HomeController extends Controller
 {
     private const EXPORT_TYPE = [
         'YamatoTransport' => 'ヤマト運輸（B2クラウド）'
@@ -41,7 +41,7 @@ class CsvController extends Controller
         if ($Validator->fails()) {
             return new JsonResponse([
                 'errors' => $Validator->messages()->toArray()
-                ], 422);
+            ], 422);
         }
 
         $methodName = 'ExportCsvConvert_' . $request->get('export_type');
