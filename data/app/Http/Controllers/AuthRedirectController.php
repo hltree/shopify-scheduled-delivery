@@ -51,6 +51,19 @@ class AuthRedirectController extends Controller
             'AccessToken' => $accessToken
         ]);
 
+        /**
+         * @returns array
+         */
+        $shopifyThemes = $shopify->Theme->get();
+
+        if (!isset($shopifyThemes) || !is_array($shopifyThemes)) die('テーマがないようです。作成してから再度実行してください');
+        foreach ($shopifyThemes as $theme) {
+            $shopify->Theme($theme['id'])->Asset->put([
+                'key' => 'snippets/form-scheduled-delivery.liquid',
+                'value' => view('snippets.form-scheduled-delivery')->render()
+            ]);
+        }
+
         // app handle 取得
         $graphQL =
             <<<Query
