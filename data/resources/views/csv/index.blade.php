@@ -61,7 +61,7 @@
 <p>配送業者のシステムに取込み可能な形式でCSV出力します！ヤマト運輸（B2クラウド）は<a
         href="https://www.kuronekoyamato.co.jp/newb2/help/manual/manual_sosa/16_exchange/exchange_01.html">こちら</a>を参考にしています！
 </p>
-<form action="{{ route('csv.export') }}" method="post">
+<form action="{{ route('export') }}" method="post">
     @csrf
     @error('order')
     <div class="error alert alert-danger">{{ $message }}</div>
