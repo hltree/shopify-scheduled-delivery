@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Option;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use PHPShopify\ShopifySDK;
 
 class HomeController extends Controller
 {
@@ -23,8 +21,6 @@ class HomeController extends Controller
         'false' => '含めない',
         'true' => '含める'
     ];
-
-    private $ShopifySDK = null;
 
     public function index()
     {
@@ -79,16 +75,7 @@ class HomeController extends Controller
      */
     protected function getOrders(array $requestAll): array
     {
-        $Option = new Option();
-        $accessToken = $Option->getAccessToken();
-
-        if (!$accessToken) {
-            die('アクセストークンがありません');
-        }
-        $this->ShopifySDK = new ShopifySDK([
-            'ShopUrl' => config('app.shopUrl'),
-            'AccessToken' => $accessToken
-        ]);
+        $this->initSDK();
 
         // 全件取得してしまう
         $fullData = $this->ShopifySDK->Order->get([
