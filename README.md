@@ -2,9 +2,17 @@
 
 名前は適当につけました。お察しください。
 
+## Requirements
+
+用意していただくものは下記の要件を満たすサーバーのみです。
+
+当アプリは Laravel Framework 8.83.8 で動作しています。
+
+利用要件は [公式](https://readouble.com/laravel/8.x/ja/deployment.html?header=%25E3%2582%25B5%25E3%2583%25BC%25E3%2583%2590%25E8%25A6%2581%25E4%25BB%25B6) をご確認ください。
+
 ## Installation
 
-基本的なアプリの導入方法は [こちら](https://github.com/hltree/learn-shopify-app/) を参照ください。
+アプリの導入方法は [こちら](./documentation/Installation.md) を参照ください。
 
 ## Usage
 
