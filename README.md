@@ -43,14 +43,13 @@ Dawnテーマで当アプリを適用する方法は下記の通りです
 また、その上のJavaScript記述
 ```
 var fsd = document.querySelector('#scheduled-delivery')
-    var fsdh = document.querySelector('#scheduled-delivery-hidden')
-    if (fsd && fsdh) {
-        var inputName = fsd.attributes.name.textContent
-        var matches = inputName.match(/^attributes\[(.*)\]/)
-        if (matches[1]) {
-            fsdh.setAttribute('value', matches[1])
-        }
+var fsdh = document.querySelector('#scheduled-delivery-hidden')
+if (fsd && fsdh) {
+    var inputName = fsd.attributes.name.textContent
+    var matches = inputName.match(/^attributes\[(.*)\]/)
+    if (matches[1]) {
+        fsdh.setAttribute('value', matches[1])
     }
-});
+}
 ```
 こちらも変更しないでください
