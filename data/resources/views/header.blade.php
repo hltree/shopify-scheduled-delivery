@@ -397,24 +397,34 @@
         body {
             font-family: 'Nunito', sans-serif;
         }
+
+        .float-nav {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+        }
+        .float-nav ul li {
+            list-style: none;
+        }
+        .float-nav .setting {
+            background: url('{{ asset('setting.png') }}') no-repeat center/contain;
+            display: block;
+            font-size: 0;
+            line-height: 0;
+            letter-spacing: 0;
+            text-indent: 0;
+            height: 32px;
+            width: 32px;
+        }
     </style>
-    <link href="/storage/css/dark.css" rel="stylesheet" />
-    <script src="/storage/js/sweetalert2.min.js"></script>
+    <link href="{{ asset('dark.css') }}" rel="stylesheet" />
+    <script src="{{ asset('sweetalert2.min.js') }}"></script>
 </head>
 <body class="antialiased">
-<div
-    class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
-    @if (Route::has('login'))
-        <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
-            @auth
-                <a href="{{ url('/home') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Home</a>
-            @else
-                <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                @endif
-            @endauth
-        </div>
-    @endif
+<div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
+    <nav class="float-nav">
+        <ul>
+            <li><a href="" class="setting">設定</a></li>
+        </ul>
+    </nav>
     <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
