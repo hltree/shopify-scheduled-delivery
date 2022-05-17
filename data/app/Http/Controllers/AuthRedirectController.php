@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Option;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use PHPShopify\AuthHelper;
 use PHPShopify\ShopifySDK;
@@ -56,11 +57,22 @@ class AuthRedirectController extends Controller
          */
         $shopifyThemes = $shopify->Theme->get();
 
+        try {
+            $liquidFile = File::get(resource_path('shopify/snippets/form-scheduled-delivery.liquid'));
+            $jsFile = File::get(resource_path('shopify/assets/form-scheduled-delivery.js'));
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+
         if (!isset($shopifyThemes) || !is_array($shopifyThemes)) die('テーマがないようです。作成してから再度実行してください');
         foreach ($shopifyThemes as $theme) {
             $shopify->Theme($theme['id'])->Asset->put([
+                'key' => 'assets/form-scheduled-delivery.js',
+                'value' => $jsFile
+            ]);
+            $shopify->Theme($theme['id'])->Asset->put([
                 'key' => 'snippets/form-scheduled-delivery.liquid',
-                'value' => view('snippets.form-scheduled-delivery')->render()
+                'value' => $liquidFile
             ]);
         }
 

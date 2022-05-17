@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.js"></script>
+<script src="{{ 'form-scheduled-delivery.js' | asset_url }}" defer="defer"></script>
+<style>
+    .form-scheduled-delivery {
+        padding: 40px 0;
+    }
+</style>
+<p class="cart-attribute__field form-scheduled-delivery">
+    <label for="scheduled-delivery">配送希望日</label>
+    <input type="text" id="scheduled-delivery" data-id="multiple" name="attributes[配送希望日]" />
+    <input type="hidden" id="scheduled-delivery-hidden" name="attributes[form-scheduled-delivery-key-name]" />
+</p>
