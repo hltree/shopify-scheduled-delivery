@@ -1,0 +1,73 @@
+/**
+ * Bootstrap Component
+ */
+ .alert {
+     position: relative;
+     padding: 0.75rem 1.25rem;
+     margin-bottom: 1rem;
+     border: 1px solid transparent;
+     border-radius: 0.25rem;
+ }
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+/**
+ * Components
+ */
+button {
+    padding: 1.3em 3em;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font-weight: 500;
+    color: #000;
+    background-color: #fff;
+    border: none;
+    border-radius: 45px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+}
+
+button:hover {
+    background-color: #2EE59D;
+    box-shadow: 0 15px 20px rgba(46, 229, 157, 0.4);
+    color: #fff;
+    transform: translateY(-7px);
+}
+
+button:active {
+    transform: translateY(-1px);
+}
+
+form {
+    margin-top: 40px;
+}
+
+legend {
+    font-weight: 700;
+}
+
+a {
+    color: blue;
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+span[data-error-export] {
+    visibility: hidden;
+}
