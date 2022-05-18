@@ -17,6 +17,15 @@
             right: 20px;
             top: 20px;
         }
+
+        .float-nav ul {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+            width: 80px;
+        }
+
         .float-nav ul li {
             list-style: none;
         }
@@ -30,12 +39,25 @@
             height: 32px;
             width: 32px;
         }
+
+        .float-nav .home {
+            background: url('{{ asset('home.png') }}') no-repeat center/contain;
+            display: block;
+            font-size: 0;
+            line-height: 0;
+            letter-spacing: 0;
+            text-indent: 0;
+            height: 32px;
+            opacity: .6;
+            width: 32px;
+        }
     </style>
 </head>
 <body class="antialiased">
 <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
     <nav class="float-nav">
         <ul>
+            <li><a href="{{ route('home') }}" class="home">家</a></li>
             <li><a href="{{ route('setting.index') }}" class="setting">設定</a></li>
         </ul>
     </nav>
