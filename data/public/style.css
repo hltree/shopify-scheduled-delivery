@@ -66,6 +66,10 @@ video {
     border-top-width: 1px
 }
 
+.max-w-6xl {
+    width: 100%;
+}
+
 .flex {
     display: flex
 }
@@ -386,6 +390,32 @@ body {
     font-family: 'Nunito', sans-serif;
 }
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+table th, table td {
+    text-align: center;
+}
+
+table tr:nth-child(odd) {
+    background-color: #eee
+}
+
+table a {
+    display: block;
+    height: 100%;
+    padding: 10px 0;
+    transition: opacity .5s;
+    width: 100%;
+}
+
+table a:hover {
+    opacity: .5;
+}
+
 /**
  * Bootstrap Component
  */
@@ -429,9 +459,17 @@ body {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
+a.btn {
+    text-decoration: none;
+}
+
 .btn:hover {
     color: #212529;
     text-decoration: none;
+}
+
+a.btn:hover {
+    color: initial;
 }
 
 .btn-outline-primary:hover {
@@ -460,6 +498,22 @@ body {
 .btn-outline-secondary {
     color: #6c757d;
     border-color: #6c757d;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover, a.btn.btn-secondary:hover {
+    color: #fff;
+}
+
+.btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show>.btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: #545b62;
+    border-color: #4e555b;
 }
 
 /**

@@ -62,3 +62,11 @@
         </ul>
     </nav>
     <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            @php
+                $current = \Illuminate\Support\Facades\Route::current();
+            @endphp
+            <a href="{{ route('home') }}" class="btn btn-secondary {{ 'home' === $current->getName() ? 'active' : '' }}">初期設定</a>
+            <a href="{{ route('setting.index') }}" class="btn btn-secondary {{ 'setting' === explode('.', $current->getName())[0] ? 'active' : '' }}">配送希望日時カレンダーの設定</a>
+            <a href="" class="btn btn-secondary {{ 'csv' === explode('.', $current->getName())[0] ? 'active' : '' }}">CSV出力</a>
+        </div>

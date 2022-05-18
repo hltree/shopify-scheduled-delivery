@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'App\Http\Controllers\HomeController@index')->name('home');
-Route::post('/', 'App\Http\Controllers\HomeController@export')->name('export');
 
 Route::get('sendAuthorize', 'App\Http\Controllers\AuthorizeController@index')->name('sendAuthorize');
 Route::get('authRedirect', 'App\Http\Controllers\AuthRedirectController@index')->name('authRedirect');
