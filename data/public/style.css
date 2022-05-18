@@ -544,3 +544,7 @@ a:hover {
 span[data-error-export] {
     visibility: hidden;
 }
+
+.swal2-html-container {
+    color: #fff;
+}

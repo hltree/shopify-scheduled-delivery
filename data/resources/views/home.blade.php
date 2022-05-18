@@ -1,10 +1,10 @@
 @include('header')
 <h2>初期設定</h2>
-<p>このページではカレンダーの休日設定ができます。</p>
+<p>このページでは初期設定ができます。</p>
 <table>
     <tr>
         <td>
-            <a class="default js-check" href="{{ route('sendAuthorize') }}">初期化（再インストール）</a>
+            <a class="default js-check" href="{{ route('sendAuthorize') }}">初期化（インストール）</a>
         </td>
     </tr>
 </table>
@@ -15,7 +15,7 @@
                 e.preventDefault()
                 Swal.fire({
                     title: 'よろしいですか？',
-                    text: "以前のデータは削除され、初期化されます",
+                    text: "既にインストールされている場合、以前の設定は破棄されます",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
