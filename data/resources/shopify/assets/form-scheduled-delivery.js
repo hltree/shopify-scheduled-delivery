@@ -3,8 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // area_flatpickr_s
     var fp = flatpickr('#scheduled-delivery', {
         enableTime: true,
-        dateFormat: "Y-m-d H:i"
+        minDate: "today",
+        dateFormat: "Y-m-d H:i",
+        inline: true
     })
+    document.getElementById('scheduled-delivery').style = "position: absolute; visibility: hidden";
     // area_flatpickr_e
     // here.
 

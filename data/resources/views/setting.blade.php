@@ -42,7 +42,7 @@
         @foreach($themes as $themeId => $themeName)
             <tr>
                 <td>
-                    <a href="{{ route('setting.edit', ['themeId' => $themeId]) }}">{{ $themeName }}</a>
+                    <a class="default" href="{{ route('setting.edit', ['themeId' => $themeId]) }}">{{ $themeName }}</a>
                 </td>
             </tr>
         @endforeach

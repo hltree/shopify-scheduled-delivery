@@ -42,7 +42,7 @@
         <span data-error-export="include_archive_order"></span>
     </fieldset>
     <fieldset>
-        <button type="submit" name="submitter">ダウンロードする</button>
+        <input type="submit" name="submitter" value="ダウンロードする" class="btn btn-outline-primary" />
     </fieldset>
 </form>
 <script>

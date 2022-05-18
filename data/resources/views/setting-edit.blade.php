@@ -15,6 +15,22 @@
             display: block;
             margin-top: 20px;
         }
+
+        fieldset {
+            padding: 10px 0;K
+        }
+
+        p {
+            margin: 0;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        #scheduled-delivery {
+            border: 1px solid;
+        }
     </style>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.js"></script>
@@ -26,6 +42,10 @@
                 fp.set('mode', 'multiple')
                 fp.set('dateFormat', 'Y-m-d')
                 fp.timeContainer.style = 'display: none'
+
+                if (false === fp.config.inline) {
+                    document.getElementById('disabled_inline').checked = true
+                }
             }
 
             document.getElementById('flatpickr-clear').addEventListener('click', function () {
@@ -36,9 +56,14 @@
     <form action="{{ route('setting.update', ['themeId' => $themeId]) }}" method="post">
         @csrf
         @method('PUT')
-        <input type="text" id="scheduled-delivery" data-id="multiple" name="close_days" style="border: 1px solid" />
-        <span class="underline text-gray-900 dark:text-white" id="flatpickr-clear">クリアする</span>
-        <input type="submit" value="保存" />
+        <fieldset>
+            <input type="text" id="scheduled-delivery" data-id="multiple" name="close_days" />
+        </fieldset>
+        <fieldset>
+            <input type="checkbox" name="disabled_inline" id="disabled_inline" /><label for="disabled_inline">カレンダーをインラインで表示しない</label>
+        </fieldset>
+        <span class="btn btn-outline-secondary" id="flatpickr-clear">クリアする</span>
+        <input type="submit" value="保存" class="btn btn-outline-primary" />
     </form>
 @endisset
 @include('footer')

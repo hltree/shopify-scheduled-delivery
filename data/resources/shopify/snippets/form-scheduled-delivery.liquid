@@ -5,9 +5,18 @@
     .form-scheduled-delivery {
         padding: 40px 0;
     }
+
+    .flatpickr-calendar.inline {
+        margin-top: 20px;
+    }
+
+    #scheduled-delivery {
+        position: absolute;
+        visibility: hidden;
+    }
 </style>
 <p class="cart-attribute__field form-scheduled-delivery">
-    <label for="scheduled-delivery">配送希望日</label>
+    <label for="scheduled-delivery">配送希望日時</label>
     <input type="text" id="scheduled-delivery" data-id="multiple" name="attributes[配送希望日]" />
     <input type="hidden" id="scheduled-delivery-hidden" name="attributes[form-scheduled-delivery-key-name]" />
 </p>

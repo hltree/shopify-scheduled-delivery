@@ -64,8 +64,6 @@ class SettingController extends Controller
 
     public function update(string $themeId, Request $request)
     {
-        $viewParams = [];
-
         $this->initSDK();
 
         try {
@@ -75,6 +73,7 @@ class SettingController extends Controller
             $shopifyTheme = $this->ShopifySDK->Theme($themeId);
 
             $closeDays = $request->get('close_days');
+            $disabledInline = $request->get('disabled_inline');
             if ($closeDays) {
                 $closeDaysArray = explode(',', $closeDays);
             }
@@ -85,6 +84,13 @@ class SettingController extends Controller
 
             $areaFlatPickr = false;
             foreach ($splitJsFile as $number => $line) {
+                if (1 === preg_match('/inline/', $line)) {
+                    if ($disabledInline) {
+                        $newFileLines[$number] = '';
+                    } else {
+                        $newFileLines[$number] = 'inline: true';
+                    }
+                }
                 if (true === $areaFlatPickr) {
                     if (isset($closeDaysArray)) {
                         $newFileLines[$number] .= "\ndisable: [";
@@ -96,6 +102,13 @@ class SettingController extends Controller
                     $areaFlatPickr = false;
                 }
                 if (1 === preg_match('/area_flatpickr_s/', $line)) $areaFlatPickr = true;
+                if (1 === preg_match('/area_flatpickr_e/', $line)) {
+                    if ($disabledInline) {
+                        $newFileLines[$number - 1] = '';
+                    } else {
+                        $newFileLines[$number - 1] = "document.getElementById('scheduled-delivery').style = 'position: absolute; visibility: hidden';";
+                    }
+                }
             }
 
             $newFile = implode("\n", $newFileLines);
