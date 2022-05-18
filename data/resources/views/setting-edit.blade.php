@@ -17,7 +17,7 @@
         }
 
         fieldset {
-            padding: 10px 0;K
+            padding: 10px 0;
         }
 
         p {
