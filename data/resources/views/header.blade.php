@@ -424,7 +424,7 @@
 <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
     <nav class="float-nav">
         <ul>
-            <li><a href="" class="setting">設定</a></li>
+            <li><a href="{{ route('setting.index') }}" class="setting">設定</a></li>
         </ul>
     </nav>
     <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">

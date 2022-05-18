@@ -18,3 +18,9 @@ Route::post('/', 'App\Http\Controllers\HomeController@export')->name('export');
 
 Route::get('sendAuthorize', 'App\Http\Controllers\AuthorizeController@index')->name('sendAuthorize');
 Route::get('authRedirect', 'App\Http\Controllers\AuthRedirectController@index')->name('authRedirect');
+
+Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
+    Route::get('/', 'App\Http\Controllers\SettingController@index')->name('index');
+    Route::get('{themeId}/edit', 'App\Http\Controllers\SettingController@edit')->name('edit');
+    Route::put('{themeId}', 'App\Http\Controllers\SettingController@update')->name('update');
+});
