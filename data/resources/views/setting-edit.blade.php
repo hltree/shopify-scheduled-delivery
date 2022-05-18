@@ -1,5 +1,5 @@
 @include('header')
-<h2>設定</h2>
+<h2>配送希望日時カレンダーの設定</h2>
 <p>休日設定をして保存をクリックしてください</p>
 @if(isset($cEroors))
     @foreach ($cEroors as $error)
