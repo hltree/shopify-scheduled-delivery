@@ -9,6 +9,8 @@ use PHPShopify\ShopifySDK;
 
 class AuthorizeController extends Controller
 {
+    protected bool $auth = false;
+
     public function index()
     {
         new ShopifySDK([

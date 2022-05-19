@@ -12,6 +12,8 @@ use PHPShopify\ShopifySDK;
 
 class AuthRedirectController extends Controller
 {
+    protected bool $auth = false;
+
     public function index()
     {
         new ShopifySDK([

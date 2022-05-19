@@ -14,6 +14,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    protected bool $auth = true;
     protected ShopifySDK $ShopifySDK;
     protected string $cookieShop = '';
     protected string $cookieHmac = '';
@@ -53,7 +54,7 @@ class Controller extends BaseController
             if ($accessToken) {
                 Option::reset($this->cookieShop);
             }
-            if ('home' !== Route::current()->getName()) abort(401, __('まだインストールされていないようです。トップページからインストールしてください'));
+            if (true === $this->auth) abort(401, __('まだインストールされていないようです。トップページからインストールしてください'));
         }
     }
 
