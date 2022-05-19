@@ -7,9 +7,14 @@ use Illuminate\Support\Facades\File;
 
 class SettingController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->initSDK();
+    }
+
     public function index()
     {
-        $this->initSDK();
         /**
          * @returns array
          */
@@ -24,12 +29,11 @@ class SettingController extends Controller
             }
         }
 
-        return view('setting', $viewParams);
+        return $this->View('setting', $viewParams);
     }
 
     public function edit(string $themeId)
     {
-        $this->initSDK();
         /**
          * @returns array
          */
@@ -59,13 +63,11 @@ class SettingController extends Controller
             $viewParams['cEroors'][] = __('テーマは存在しますか？再インストールが必要な場合は');
         }
 
-        return view('setting-edit', $viewParams);
+        return $this->View('setting-edit', $viewParams);
     }
 
     public function update(string $themeId, Request $request)
     {
-        $this->initSDK();
-
         try {
             /**
              * @returns array

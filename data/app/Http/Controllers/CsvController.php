@@ -24,7 +24,7 @@ class CsvController extends Controller
 
     public function index()
     {
-        return view('csv.index', [
+        return $this->View('csv.index', [
             'EXPORT_TYPE' => self::EXPORT_TYPE,
             'TARGET_LABEL' => self::TARGET_LABEL,
             'INCLUDE_ARCHIVE_ORDER' => self::INCLUDE_ARCHIVE_ORDER

@@ -12,7 +12,7 @@ class AuthorizeController extends Controller
     public function index()
     {
         new ShopifySDK([
-            'ShopUrl' => config('app.shopUrl'),
+            'ShopUrl' => $this->cookieShop,
             'ApiKey' => config('app.apiKey'),
             'SharedSecret' => config('app.secretKey')
         ]);

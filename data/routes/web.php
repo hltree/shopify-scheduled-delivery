@@ -23,3 +23,6 @@ Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
     Route::get('{themeId}/edit', 'App\Http\Controllers\SettingController@edit')->name('edit');
     Route::put('{themeId}', 'App\Http\Controllers\SettingController@update')->name('update');
 });
+
+Route::group(['prefix' => 'csv', 'as' => 'csv.'], function () {
+});

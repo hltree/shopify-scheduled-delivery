@@ -15,7 +15,7 @@ class AuthRedirectController extends Controller
     public function index()
     {
         new ShopifySDK([
-            'ShopUrl' => config('app.shopUrl'),
+            'ShopUrl' => $this->cookieShop,
             'ApiKey' => config('app.apiKey'),
             'SharedSecret' => config('app.secretKey')
         ]);
@@ -23,32 +23,32 @@ class AuthRedirectController extends Controller
             $accessToken = AuthHelper::getAccessToken();
         } catch (\Exception $Exception) {
             if ($Exception instanceof \PHPShopify\Exception\CurlException) {
-                echo 'おそらくセッションの有効期限切れです。sendAuthorizeからやり直してください';
-                die();
+                abort('400', 'セッションの有効期限切れです。はじめからやり直してください');
             }
+            abort('400', $Exception->getMessage());
         }
 
         /**
          * アプリの再インストール等に対応するため、アクセストークンは再登録させるようにする
          */
-        Option::reset();
+        Option::reset($this->cookieShop);
         DB::beginTransaction();
         try {
-            if (!isset($accessToken)) throw new \Exception('トークンを取得できませんでした');
+            if (!isset($accessToken)) throw new \Exception();
             Option::create([
-                'access_token' => $accessToken
+                'access_token' => $accessToken,
+                'shop_url' => $this->cookieShop
             ]);
             DB::commit();
         } catch (\Exception $Exception) {
             DB::rollBack();
-            echo $Exception->getMessage();
-            die();
+            abort('400', 'トークンを保存できませんでした。はじめからやり直してください');
         }
 
         $config = ShopifySDK::$config;
         // ShopifySDKオブジェクト 取得
         $shopify = new ShopifySDK([
-            'ShopUrl' => $config['ShopUrl'],
+            'ShopUrl' => $this->cookieShop,
             'AccessToken' => $accessToken
         ]);
 
@@ -61,7 +61,7 @@ class AuthRedirectController extends Controller
             $liquidFile = File::get(resource_path('shopify/snippets/form-scheduled-delivery.liquid'));
             $jsFile = File::get(resource_path('shopify/assets/form-scheduled-delivery.js'));
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            abort(400);
         }
 
         if (!isset($shopifyThemes) || !is_array($shopifyThemes)) die('テーマがないようです。作成してから再度実行してください');
@@ -76,18 +76,6 @@ class AuthRedirectController extends Controller
             ]);
         }
 
-        // app handle 取得
-        $graphQL =
-            <<<Query
-query {
-  app {
-    handle
-  }
-}
-Query;
-        $appResponse = $shopify->GraphQL->post($graphQL);
-        header('Location: ' . $config['AdminUrl'] . 'apps/' . $appResponse['data']['app']['handle']);
-
-        exit;
+        return redirect(route('home'))->with('success', __('インストールを正常に完了しました'));
     }
 }
