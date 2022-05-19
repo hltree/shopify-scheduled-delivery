@@ -232,9 +232,8 @@ return [
 
     ],
 
-    'shopUrl' => env('SHOP_URL', 'your-store-url'),
-    'apiKey' => env('SHOP_API_KEY', 'your-app-api-key'),
-    'secretKey' => env('SHOP_SECRET_KEY', 'your-app-secret-key'),
+    'apiKey' => env('APP_API_KEY', 'your-app-api-key'),
+    'secretKey' => env('APP_SECRET_KEY', 'your-app-secret-key'),
 
     /**
      * read_content, write_content
