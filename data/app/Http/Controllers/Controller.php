@@ -89,7 +89,7 @@ class Controller extends BaseController
                 $this->cookieHmac = $_COOKIE['shopify-scheduled-delivery-val-hmac'];
             }
         } catch (\Exception $e) {
-            abort(401);
+            abort(401, __('Shopifyからアクセスしてください'));
         }
     }
 
