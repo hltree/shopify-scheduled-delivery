@@ -75,8 +75,6 @@ class CsvController extends Controller
      */
     protected function getOrders(array $requestAll): array
     {
-        $this->initSDK();
-
         // 全件取得してしまう
         $fullData = $this->ShopifySDK->Order->get([
             'status' => 'any'

@@ -22,6 +22,7 @@ class Controller extends BaseController
     {
         $this->setCookie();
         $this->verifyHmac();
+        $this->initSDK();
     }
 
     protected function View(string $view = '', array $data = [])
@@ -49,7 +50,10 @@ class Controller extends BaseController
              */
             $this->ShopifySDK->Theme->get();
         } catch (\Exception $e) {
-            abort(401, __('まだインストールされていないようです。トップページからインストールしてください'));
+            if ($accessToken) {
+                Option::reset($this->cookieShop);
+            }
+            if ('home' !== Route::current()->getName()) abort(401, __('まだインストールされていないようです。トップページからインストールしてください'));
         }
     }
 

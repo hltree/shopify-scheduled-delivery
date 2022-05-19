@@ -7,12 +7,6 @@ use Illuminate\Support\Facades\File;
 
 class SettingController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->initSDK();
-    }
-
     public function index()
     {
         /**
