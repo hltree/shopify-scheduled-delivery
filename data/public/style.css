@@ -500,6 +500,18 @@ a.btn:hover {
     border-color: #6c757d;
 }
 
+.btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
 .btn-secondary {
     color: #fff;
     background-color: #6c757d;
@@ -515,6 +527,19 @@ a.btn:hover {
     background-color: #545b62;
     border-color: #4e555b;
 }
+
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    color: #fff;
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
 
 /**
  * Components

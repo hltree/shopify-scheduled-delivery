@@ -9,9 +9,6 @@ use Illuminate\Validation\ValidationException;
 
 class CsvController extends Controller
 {
-    private const EXPORT_TYPE = [
-        'YamatoTransport' => 'ヤマト運輸（B2クラウド）'
-    ];
     private const TARGET_LABEL = [
         'unfulfilled' => '未発送',
 //        'partial' => '一部発送済',
@@ -22,12 +19,176 @@ class CsvController extends Controller
         'true' => '含める'
     ];
 
+    private const ALLOW_READ_PROPERTIES = [
+
+        /**
+         * Order APIから取得できるデータ
+         */
+        'buyer_accepts_marketing' => [
+            'return' => '1 か 0（空文字）',
+            'description' => '顧客がショップからの更新メールの受信に同意したかどうか'
+        ],
+        'cancel_reason' => [
+            'return' => 'customer, fraud, inventory, declined, other のいずれか',
+            'description' => 'キャンセルされた理由'
+        ],
+        'cancelled_at' => [
+            'return' => 'null（空文字。キャンセルされていない) か キャンセルされた日時',
+            'description' => 'キャンセルされた日時'
+        ],
+        'close_at' => [
+            'return' => 'null(空文字。クローズされていない) か 日時',
+            'description' => '注文をクローズ（アーカイブ）した日時'
+        ],
+        'currency' => [
+            'return' => 'ショップ通貨の3文字コード',
+            'description' => 'ISO 4217で定められた通貨の3文字コード'
+        ],
+        'confirmed' => [
+            'return' => '1 か 0（空文字）',
+            'description' => '確定済（支払い完了）の注文かどうか'
+        ],
+        'contact_email' => [
+            'return' => '注文時に入力したメールアドレス',
+            'description' => '注文時に入力したメールアドレス'
+        ],
+        'current_subtotal_price' => [
+            'return' => '税抜きの注文合計料金',
+            'description' => '注文の合計料金（税抜き）'
+        ],
+        'current_total_discounts' => [
+            'return' => '割引額の合計',
+            'description' => '割引額の合計（注文合計料金から割引額を引いた値ではない）'
+        ],
+        'current_total_price' => [
+            'return' => '税も含めた注文合計金額',
+            'description' => '税も含めた注文合計金額'
+        ],
+        'current_total_tax' => [
+            'return' => '税額',
+            'description' => '税額'
+        ],
+        'order_number' => [
+            'return' => '注文番号',
+            'description' => '注文番号'
+        ],
+        'phone' => [
+            'return' => 'null(空文字。電話番号なし) か 電話番号',
+            'description' => '電話番号'
+        ],
+        'shipping_address-first_name' => [
+            'return' => '注文者の名前',
+            'description' => '注文者の名前'
+        ],
+        'shipping_address-address1' => [
+            'return' => '注文者の住所１',
+            'description' => '注文者の住所１'
+        ],
+        'shipping_address-address2' => [
+            'return' => '注文者の住所２',
+            'description' => '注文者の住所２'
+        ],
+        'shipping_address-city' => [
+            'return' => '注文者の住所町名',
+            'description' => '注文者の住所町名'
+        ],
+        'shipping_address-zip' => [
+            'return' => '注文者の郵便番号',
+            'description' => '注文者の郵便番号'
+        ],
+        'shipping_address-province' => [
+            'return' => '注文者の県名',
+            'description' => '注文者の県名'
+        ],
+        'shipping_address-country' => [
+            'return' => '注文者の国名',
+            'description' => '注文者の国名'
+        ],
+        'shipping_address-last_name' => [
+            'return' => '注文者の苗字',
+            'description' => '注文者の苗字'
+        ],
+        'shipping_address-company' => [
+            'return' => '注文者の会社名など',
+            'description' => '注文者の会社名など'
+        ],
+        'billing_address-first_name' => [
+            'return' => '発送先の名前',
+            'description' => '発送先の名前（ない場合はshipping_address-first_nameが入ります）'
+        ],
+        'billing_address-address1' => [
+            'return' => '配送先の住所１',
+            'description' => '配送先の住所１発送先の名前（ない場合はshipping_address-address1が入ります）'
+        ],
+        'billing_address-address2' => [
+            'return' => '配送先の住所２',
+            'description' => '配送先の住所２（ない場合はshipping_address-address2が入ります）'
+        ],
+        'billing_address-city' => [
+            'return' => '配送先の住所町名',
+            'description' => '配送先の住所町名（ない場合はshipping_address-cityが入ります）'
+        ],
+        'billing_address-zip' => [
+            'return' => '配送先の郵便番号',
+            'description' => '配送先の郵便番号（ない場合はshipping_address-zipが入ります）'
+        ],
+        'billing_address-province' => [
+            'return' => '配送先の県名',
+            'description' => '配送先の県名（ない場合はshipping_address-provinceが入ります）'
+        ],
+        'billing_address-country' => [
+            'return' => '配送先の国名',
+            'description' => '配送先の国名（ない場合はshipping_address-countryが入ります）'
+        ],
+        'billing_address-last_name' => [
+            'return' => '配送先の苗字',
+            'description' => '配送先の苗字（ない場合はshipping_address-last_nameが入ります）'
+        ],
+        'billing_address-company' => [
+            'return' => '配送先の会社名など',
+            'description' => '配送先の会社名など（ない場合はshipping_address-companyが入ります）'
+        ],
+        'shipping_lines-code' => [
+            'return' => '注文時に選択したデリバリーコード',
+            'description' => '注文時に選択したデリバリーコード'
+        ],
+        'shipping_lines-delivery_category' => [
+            'return' => '注文時に選択したデリバリーのカテゴリー',
+            'description' => '注文時に選択したデリバリーのカテゴリー'
+        ],
+        'shipping_lines-price' => [
+            'return' => '注文時に選択したデリバリーの金額',
+            'description' => '注文時に選択したデリバリーの金額'
+        ],
+        'shipping_lines-title' => [
+            'return' => '注文時に選択したデリバリー名',
+            'description' => '注文時に選択したデリバリー名'
+        ],
+        '配送希望日' => [
+            'return' => '注文時に選択した配送希望日',
+            'description' => 'このアプリのカレンダーに入力された配送希望日の値'
+        ]
+    ];
+
+    private array $fullOrder = [];
+
     public function index()
     {
+        $this->fullOrder = $this->ShopifySDK->Order->get([
+            'status' => 'any'
+        ]);
+
         return $this->View('csv.index', [
-            'EXPORT_TYPE' => self::EXPORT_TYPE,
             'TARGET_LABEL' => self::TARGET_LABEL,
-            'INCLUDE_ARCHIVE_ORDER' => self::INCLUDE_ARCHIVE_ORDER
+            'INCLUDE_ARCHIVE_ORDER' => self::INCLUDE_ARCHIVE_ORDER,
+            'ALLOW_READ_PROPERTIES' => self::ALLOW_READ_PROPERTIES
+        ]);
+    }
+
+    public function document()
+    {
+        return $this->View('csv.document', [
+            'properties' => self::ALLOW_READ_PROPERTIES
         ]);
     }
 
@@ -40,26 +201,25 @@ class CsvController extends Controller
             ], 422);
         }
 
-        $methodName = 'ExportCsvConvert_' . $request->get('export_type');
-        if (!method_exists($this, $methodName)) die($methodName . 'というメソッドはないです');
-
         $orders = $this->getOrders($request->all());
 
-        if (!is_array($orders) || 0 === count($orders)) throw ValidationException::withMessages(['order' => '出力できる注文がありません']);
-        $this->$methodName($orders);
+        if (!is_array($orders) || 0 === count($orders)) throw ValidationException::withMessages(['order' => __('出力できる注文がありません')]);
+        return $this->ExportCsv($orders, $request);
     }
 
     protected function validator(array $data): \Illuminate\Validation\Validator
     {
         $validations = [
-            'export_type' => ['required', 'equal:' . implode('|', array_keys(self::EXPORT_TYPE))],
+            'select' => ['required', 'array'],
+            'select.*' => ['required', 'string'],
             'target_label' => ['required', 'equal:' . implode('|', array_keys(self::TARGET_LABEL))],
             'include_archive_order' => ['required', 'equal:' . implode('|', array_keys(self::INCLUDE_ARCHIVE_ORDER))]
         ];
 
         $messages = [
-            'export_type.required' => '選択してください',
-            'export_type.equal' => '不正な値が入ってしまったようです',
+            'select.required' => '選択してください',
+            'select.array' => '不正な値が入ってしまったようです',
+            'select.*.string' => '文字列にしてください',
             'target_label.required' => '選択してください',
             'target_label.equal' => '不正な値が入ってしまったようです',
             'include_archive_order.required' => '選択してください',
@@ -98,389 +258,79 @@ class CsvController extends Controller
     /**
      * @param array $orders
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
-     *
-     * 形式はB2クラウドのcsvを参考にする
-     * https://www.kuronekoyamato.co.jp/newb2/help/manual/manual_sosa/16_exchange/exchange_01.html
+     * @throws \PHPShopify\Exception\ApiException
+     * @throws \PHPShopify\Exception\CurlException
      */
-    protected function ExportCsvConvert_YamatoTransport(array $orders): void
+    protected function ExportCsv(array $orders, Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $shop = $this->ShopifySDK->Shop->get();
-
-        $callback = function () use ($orders, $shop) {
+        $callback = function () use ($orders, $request) {
             $stream = fopen('php://output', 'w');
+
+            $csvHeaders = $request->get('select');
+
             // csv header
-            fputcsv($stream, [
-                "お客様管理番号\n半角英数字50文字",
-                "送り状種類
-\n半角数字1文字
-\n 0 : 発払い
-\n 2 : コレクト
-\n 3 : ＤＭ便
-\n 4 : タイム
-\n 5 : 着払い
-\n 7 : ネコポス
-\n 8 : 宅急便コンパクト
-\n 9 : 宅急便コンパクトコレクト
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)","クール区分
-\n半角数字1文字
-\n0または空白 : 通常
-\n 1 : クール冷凍
-\n 2 : クール冷蔵","伝票番号
-\n半角数字12文字
-\n
-\n※B2クラウドにて付与", "出荷予定日
-\n半角10文字
-\n｢YYYY/MM/DD｣で入力してください。
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)", "お届け予定日
-\n半角10文字
-\n｢YYYY/MM/DD｣で入力してください。
-\n
-\n※入力なしの場合、印字されません。
-\n※「最短日」と入力可", "配達時間帯
-\n半角4文字
-\nタイム、ＤＭ便以外
-\n 空白 : 指定なし
-\n 0812 : 午前中
-\n 1416 : 14～16時
-\n 1618 : 16～18時
-\n 1820 : 18～20時
-\n 1921 : 19～21時
-\n
-\nタイム
-\n 0010 : 午前10時まで
-\n 0017 : 午後5時まで", "お届け先コード
-\n半角英数字20文字", "お届け先電話番号
-\n半角数字15文字ハイフン含む
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)", "お届け先電話番号枝番
-\n半角数字2文字", "お届け先郵便番号
-\n半角数字8文字
-\nハイフンなし7文字も可
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)", "お届け先住所
-\n全角/半角
-\n都道府県（４文字）
-\n市区郡町村（１２文字）
-\n町・番地（１６文字）
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)", "お届け先アパートマンション名
-\n全角/半角
-\n16文字/32文字 ", "お届け先会社・部門１
-\n全角/半角
-\n25文字/50文字 ","お届け先会社・部門２
-\n全角/半角
-\n25文字/50文字 ","お届け先名
-\n全角/半角
-\n16文字/32文字
-\n
-\n(※宅急便_必須項目)
-\n(※ＤＭ便_必須項目)
-\n(※ネコポス_必須項目)","お届け先名(ｶﾅ)
-\n半角カタカナ 50文字 ","敬称
-\n全角/半角 2文字/4文字
-\nＤＭ便の場合に指定可能
-\n【入力例】
-\n様・御中・殿・行・係・宛・先生・なし","ご依頼主コード
-\n半角英数字 20文字 ","ご依頼主電話番号
-\n半角数字15文字ハイフン含む
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","ご依頼主電話番号枝番
-\n半角数字 2文字 ","ご依頼主郵便番号
-\n半角数字8文字
-\nハイフンなし半角7文字も可
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","ご依頼主住所
-\n全角/半角32文字/64文字
-\n都道府県（４文字）
-\n市区郡町村（１２文字）
-\n町・番地（１６文字）
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","ご依頼主アパートマンション
-\n全角/半角 16文字/32文字 ","ご依頼主名
-\n全角/半角 16文字/32文字
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","ご依頼主名(ｶﾅ)
-\n半角カタカナ 50文字","品名コード１
-\n半角英数字 30文字 ","品名１
-\n全角/半角 25文字/50文字
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","品名コード２
-\n半角英数字 30文字","品名２
-\n全角/半角 25文字/50文字 ","荷扱い１
-\n全角/半角 10文字/20文字 ","荷扱い２
-\n全角/半角 10文字/20文字 ","記事
-\n全角/半角 22文字/44文字 ","ｺﾚｸﾄ代金引換額（税込)
-\n半角数字 7文字
-\n
-\n※コレクトの場合は必須
-\n300,000円以下　1円以上
-\n※但し、宅急便コンパクトコレクトの場合は
-\n30,000円以下　　1円以上","内消費税額等
-\n半角数字 7文字
-\n
-\n※コレクトの場合は必須
-\n※コレクト代金引換額（税込)以下","止置き
-\n半角数字 1文字
-\n0 : 利用しない
-\n1 : 利用する ","営業所コード
-\n半角数字 6文字
-\n
-\n※止置きを利用する場合は必須 ","発行枚数
-\n半角数字 2文字
-\n
-\n※発払いのみ指定可能","個数口表示フラグ
-\n半角数字 1文字
-\n1 : 印字する
-\n2 : 印字しない
-\n3 : 枠と口数を印字する
-\n
-\n※宅急便コンパクト、宅急便コンパクトコレクトは対象外","請求先顧客コード
-\n半角数字12文字
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","請求先分類コード
-\n空白または半角数字3文字
-\n","運賃管理番号
-\n半角数字2文字
-\n
-\n(※宅急便_必須項目)
-\n(※ネコポス_必須項目)","クロネコwebコレクトデータ登録
-\n半角数字 1文字
-\n0 : 無し
-\n1 : 有り ","クロネコwebコレクト加盟店番号
-\n半角英数字 9文字
-\n
-\n※クロネコwebコレクトデータ有りの場合は必須 ","クロネコwebコレクト申込受付番号１
-\n半角英数字 23文字
-\n
-\n※クロネコwebコレクトデータ有りの場合は必須 ","クロネコwebコレクト申込受付番号２
-\n半角英数字 23文字","クロネコwebコレクト申込受付番号３
-\n半角英数字 23文字","お届け予定ｅメール利用区分
-\n半角数字 1文字
-\n0 : 利用しない
-\n1 : 利用する ","お届け予定ｅメールe-mailアドレス
-\n半角英数字＆記号 60文字
-\n
-\n※お届け予定eメールを利用する場合は必須 ","入力機種
-\n半角数字 1文字
-\n1 : ＰＣ
-\n2 : 携帯電話
-\n
-\n※お届け予定eメールを利用する場合は必須","お届け予定ｅメールメッセージ
-\n全角 74文字
-\n
-\n
-\n※お届け予定eメールを利用する場合は必須","お届け完了ｅメール利用区分
-\n半角数字 1文字
-\n0 : 利用しない
-\n1 : 利用する ","お届け完了ｅメールe-mailアドレス
-\n半角英数字 60文字
-\n
-\n※お届け完了eメールを利用する場合は必須 ","お届け完了ｅメールメッセージ
-\n全角 159文字
-\n
-\n※お届け完了eメールを利用する場合は必須 ","クロネコ収納代行利用区分
-\n半角数字１文字","予備
-\n半角数字１文字","収納代行請求金額(税込)
-\n半角数字７文字","収納代行内消費税額等
-\n半角数字７文字","収納代行請求先郵便番号
-\n半角数字＆ハイフン8文字","収納代行請求先住所
-\n全角/半角　32文字/64文字
-\n都道府県（４文字）
-\n市区郡町村（１２文字）
-\n町・番地（１６文字）","収納代行請求先住所（アパートマンション名）
-\n全角/半角　16文字/32文字","収納代行請求先会社・部門名１
-\n全角/半角　25文字/50文字","収納代行請求先会社・部門名２
-\n全角/半角　25文字/50文字","収納代行請求先名(漢字)
-\n全角/半角　16文字/32文字","収納代行請求先名(カナ)
-\n半角カタカナ50文字","収納代行問合せ先名(漢字)
-\n全角/半角　16文字/32文字","収納代行問合せ先郵便番号
-\n半角数字＆ハイフン8文字","収納代行問合せ先住所
-\n全角/半角　32文字/64文字
-\n都道府県（４文字）
-\n市区郡町村（１２文字）
-\n町・番地（１６文字）","収納代行問合せ先住所（アパートマンション名）
-\n全角/半角　16文字/32文字","収納代行問合せ先電話番号
-\n半角数字＆ハイフン15文字","収納代行管理番号
-\n半角英数字20文字","収納代行品名
-\n全角/半角　25文字/50文字","収納代行備考
-\n全角/半角　14文字/28文字","複数口くくりキー
-\n半角英数字20文字
-\n
-\n※「出荷予定個数」が2以上で「個数口枠の印字」で 「3 : 枠と口数を印字する」を選択し、且つ「複数口くくりキー」が空白の場合は、送り状発行時に「B2」という文言を自動補完する。","検索キータイトル1
-\n全角/半角
-\n10文字/20文字 ","検索キー1
-\n半角英数字
-\n20文字","検索キータイトル2
-\n全角/半角
-\n10文字/20文字 ","検索キー2
-\n半角英数字
-\n20文字","検索キータイトル3
-\n全角/半角
-\n10文字/20文字 ","検索キー3
-\n半角英数字
-\n20文字","検索キータイトル4
-\n全角/半角
-\n10文字/20文字 ","検索キー4
-\n半角英数字
-\n20文字","検索キータイトル5
-\n
-\n※入力時は不要。出力時に自動反映。
-\n※「ユーザーID」という文言を送り状発行時に固定で自動補完する。","検索キー5
-\n
-\n※入力時は不要。出力時に自動反映。
-\n※送り状発行時のユーザーIDを固定で自動補完する。","予備","予備","投函予定メール利用区分
-\n半角数字
-\n1文字
-\n0 : 利用しない
-\n1 : 利用する PC宛て
-\n2 : 利用する モバイル宛て","投函予定メールe-mailアドレス
-\n半角英数字＆記号
-\n60文字","投函予定メールメッセージ
-\n全角/半角
-\n74文字/148文字
-\n
-\n※半角カタカナ及び半角スペースは使えません。","投函完了メール（お届け先宛）利用区分
-\n半角数字
-\n1文字
-\n0 : 利用しない
-\n1 : 利用する PC宛て
-\n2 : 利用する モバイル宛て","投函完了メール（お届け先宛）e-mailアドレス
-\n半角英数字＆記号
-\n60文字","投函完了メール（お届け先宛）メールメッセージ
-\n全角/半角
-\n159文字/318文字
-\n
-\n※半角カタカナ及び半角スペースは使えません。","投函完了メール（ご依頼主宛）利用区分
-\n半角数字
-\n1文字
-\n0 : 利用しない
-\n1 : 利用する PC宛て
-\n2 : 利用する モバイル宛て","投函完了メール（ご依頼主宛）e-mailアドレス
-\n半角英数字＆記号
-\n60文字","投函完了メール（ご依頼主宛）メールメッセージ
-\n全角/半角
-\n159文字/318文字
-\n
-\n※半角カタカナ及び半角スペースは使えません。"
-            ]);
+            fputcsv($stream, $csvHeaders);
             foreach ($orders as $order) {
-                fputcsv($stream, [
-                    $order['id'], // お客様管理番号（注文番号にする）
-                    0, // 送り状の種類。今は判定する条件がないので、0の発払いを入れておきます
-                    '', // クール区分
-                    '', // 伝票番号。B2上で付与されます
-                    '', // 出荷予定日 YYYY/MM/DD で入力する必要ありだが、デフォルトでは出荷予定日時を選択できないので、カスタムする必要ある
-                    '', // お届け予定日 同上
-                    '', // 配達時間帯 同上。フォーマットはヘッダーを参照して
-                    '', // お届け先コード B2管理用の任意の値。なくてもいい
-                    $order['phone'], // お届け先電話番号
-                    '', // お届け先電話番号枝番 https://b-faq.kuronekoyamato.co.jp/app/answers/detail/a_id/916/~/b2%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E3%81%A7%E3%80%81%E9%80%81%E3%82%8A%E7%8A%B6%E3%81%AE%E5%85%A5%E5%8A%9B%E9%A0%85%E7%9B%AE%E3%81%AE-%E3%80%8C%E6%9E%9D%E7%95%AA%E3%80%8D-%E3%81%A8%E3%81%AF%E4%BD%95%E3%81%A7%E3%81%99%E3%81%8B%E3%80%82
-                    isset($order['shipping_address']) ? $order['shipping_address']['zip'] : '', // お届け先郵便番号
-                    isset($order['shipping_address']) ?
-                        $order['shipping_address']['province'] . ' ' . $order['shipping_address']['city'] . ' ' . $order['shipping_address']['address1']
-                        : '', // お届け先住所
-                    isset($order['shipping_address']) ? $order['shipping_address']['address2'] : '', // お届け先アパートマンション名
-                    isset($order['shipping_address']) ? $order['shipping_address']['company'] : '', // お届け先会社・部門１
-                    isset($order['shipping_address']) ? $order['shipping_address']['zip'] : '', // お届け先会社・部門２
-                    isset($order['shipping_address']) ? $order['shipping_address']['name'] : '', // お届け先名
-                    '', // お届け先名(ｶﾅ)
-                    '', // 敬称
-                    '', // ご依頼主コード お届け先コードと同じ扱い
-                    $shop['email'], // ご依頼主電話番号
-                    '', // ご依頼主電話番号枝番
-                    $shop['zip'], // ご依頼主郵便番号
-                    $shop['province'] . ' ' . $shop['city'] . ' ' . $shop['address1'], // ご依頼主住所
-                    $shop['address2'], // ご依頼主アパートマンション
-                    $shop['name'], // ご依頼主名
-                    '', // ご依頼主名(ｶﾅ)
-                    '', // 品名コード１
-                    '', // 品名１
-                    '', // 品名コード２
-                    '', // 品名２
-                    '', // 荷扱い１
-                    '', // 荷扱い２
-                    '', // 記事
-                    '', // ｺﾚｸﾄ代金引換額（税込) 300,000円以下　1円以上
-                    '', // 内消費税額等
-                    '', // 止置き
-                    '', // 営業所コード
-                    '', // 発行枚数
-                    '', // 個数口表示フラグ
-                    '', // 請求先顧客コード
-                    '', // 請求先分類コード
-                    '', // 運賃管理番号
-                    '', // クロネコwebコレクトデータ登録
-                    '', // クロネコwebコレクト加盟店番号
-                    '', // クロネコwebコレクト申込受付番号１
-                    '', // クロネコwebコレクト申込受付番号２
-                    '', // クロネコwebコレクト申込受付番号３
-                    '', // お届け予定ｅメール利用区分
-                    '', // お届け予定ｅメールe-mailアドレス
-                    '', // 入力機種
-                    '', // お届け予定ｅメールメッセージ
-                    '', // お届け完了ｅメール利用区分
-                    '', // お届け完了ｅメールe-mailアドレス
-                    '', // お届け完了ｅメールメッセージ
-                    '', // クロネコ収納代行利用区分
-                    '', // 予備
-                    '', // 収納代行請求金額(税込)
-                    '', // 収納代行内消費税額等
-                    '', // 収納代行請求先郵便番号
-                    '', // 収納代行請求先住所
-                    '', // 収納代行請求先住所（アパートマンション名）
-                    '', // 収納代行請求先会社・部門名１
-                    '', // 収納代行請求先会社・部門名２
-                    '', // 収納代行請求先名(漢字)
-                    '', // 収納代行請求先名(カナ)
-                    '', // 収納代行問合せ先名(漢字)
-                    '', // 収納代行問合せ先郵便番号
-                    '', // 収納代行問合せ先住所
-                    '', // 収納代行問合せ先住所（アパートマンション名）
-                    '', // 収納代行問合せ先電話番号
-                    '', // 収納代行管理番号
-                    '', // 収納代行品名
-                    '', // 収納代行備考
-                    '', // 複数口くくりキー
-                    '', // 検索キータイトル1
-                    '', // 検索キー1
-                    '', // 検索キータイトル2
-                    '', // 検索キー2
-                    '', // 検索キータイトル3
-                    '', // 検索キー3
-                    '', // 検索キータイトル4
-                    '', // 検索キー4
-                    '', // 検索キータイトル5 (入力しないこと)
-                    '', // 検索キー5 (入力しないこと)
-                    '', // 予備
-                    '', // 予備
-                    '', // 投函予定メール利用区分
-                    '', // 投函予定メールe-mailアドレス
-                    '', // 投函予定メールメッセージ
-                    '', // 投函完了メール（お届け先宛）利用区分
-                    '', // 投函完了メール（お届け先宛）e-mailアドレス
-                    '', // 投函完了メール（お届け先宛）メールメッセージ
-                    '', // 投函完了メール（ご依頼主宛）利用区分
-                    '', // 投函完了メール（ご依頼主宛）e-mailアドレス
-                    '' // 投函完了メール（ご依頼主宛）メールメッセージ
-                ]);
+                $input = [];
+
+                foreach ($csvHeaders as $header) {
+                    $splitAssocAr = explode('-', $header);
+                    $value = '';
+                    array_map(function ($name) use ($order, &$value, &$splitAssocAr) {
+                        if (!$value) {
+                            // shipping_lineだけなぜか配列になっているので、特殊に処理を挟む
+                            if ('shipping_lines' === $name) {
+                                $value = $order[$name][0];
+                            } else if ('配送希望日' === $name || 'note_attributes' === $name) {
+                                $keep = $order['note_attributes'];
+                                $value = '';
+                                if ('配送希望日' === $name) $name = 'form-scheduled-delivery-key-name';
+                                if ('note_attributes' === $name) $name = $splitAssocAr[array_key_last($splitAssocAr)];
+                                foreach ($keep as $attribute) {
+                                    if ($name === $attribute['name']) {
+                                        $value = $attribute['value'];
+                                        break;
+                                    }
+                                }
+                                if ('form-scheduled-delivery-key-name' === $name) {
+                                    $name = $value;
+                                    $value = '';
+                                    foreach ($keep as $attribute) {
+                                        if ($name === $attribute['name']) {
+                                            $value = $attribute['value'];
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else if (!isset($order[$name])) {
+                                $value = __('このプロパティは存在しません');
+                            } else {
+                                $value = $order[$name];
+                            }
+                        } else {
+                            $keep = $value;
+                            if (is_string($value)) {
+                            } else if (!isset($value[$name])) {
+                                $value = __('このプロパティは存在しません');
+                            } else {
+                                $value = $value[$name];
+                            }
+                            if (is_array($keep) && 'billing_address' === key($keep)) {
+                                if (isset($order['shipping_address'][$name])) $value = $order['shipping_address'][$name];
+                            }
+                        }
+                    }, $splitAssocAr);
+
+                    if (!is_string($value) && !is_int($value)) {
+                        $value = '';
+                    } else {
+                        $value = strval($value);
+                    }
+
+                    $input[] = $value;
+                }
+
+                fputcsv($stream, $input);
             }
             fclose($stream);
         };
@@ -490,6 +340,6 @@ class CsvController extends Controller
             'Content-Type' => 'application/octet-stream',
         ];
 
-        response()->streamDownload($callback, $filename, $header)->send();
+        return response()->streamDownload($callback, $filename, $header);
     }
 }

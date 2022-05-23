@@ -25,4 +25,8 @@ Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
 });
 
 Route::group(['prefix' => 'csv', 'as' => 'csv.'], function () {
+    Route::get('/', 'App\Http\Controllers\CsvController@index')->name('index');
+    Route::post('/', 'App\Http\Controllers\CsvController@export')->name('export');
+
+    Route::get('document', 'App\Http\Controllers\CsvController@document')->name('document');
 });
