@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ config('app.name') }}</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -69,6 +70,6 @@
             <a href="{{ route('home') }}" class="btn btn-secondary {{ 'home' === $current->getName() ? 'active' : '' }}">初期設定</a>
             @if ($installed)
                 <a href="{{ route('setting.index') }}" class="btn btn-secondary {{ 'setting' === explode('.', $current->getName())[0] ? 'active' : '' }}">配送希望日時カレンダーの設定</a>
-                <a href="" class="btn btn-secondary {{ 'csv' === explode('.', $current->getName())[0] ? 'active' : '' }}">CSV出力</a>
+                <a href="{{ route('csv.index') }}" class="btn btn-secondary {{ 'csv' === explode('.', $current->getName())[0] ? 'active' : '' }}">CSV出力</a>
             @endif
         </div>
