@@ -33,11 +33,11 @@ class CsvController extends Controller
             'description' => 'キャンセルされた理由'
         ],
         'cancelled_at' => [
-            'return' => 'null（空文字。キャンセルされていない) か キャンセルされた日時',
+            'return' => 'null（このプロパティは存在しない。キャンセルされていない) か キャンセルされた日時',
             'description' => 'キャンセルされた日時'
         ],
         'close_at' => [
-            'return' => 'null(空文字。クローズされていない) か 日時',
+            'return' => 'null(このプロパティは存在しない) か 日時',
             'description' => '注文をクローズ（アーカイブ）した日時'
         ],
         'currency' => [
@@ -73,7 +73,7 @@ class CsvController extends Controller
             'description' => '注文番号'
         ],
         'phone' => [
-            'return' => 'null(空文字。電話番号なし) か 電話番号',
+            'return' => 'null(このプロパティは存在しない。電話番号なし) か 電話番号',
             'description' => '電話番号'
         ],
         'shipping_address-first_name' => [
