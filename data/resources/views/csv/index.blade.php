@@ -60,6 +60,11 @@
 
     .custom-select-box {
         margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .swal2-input {
+        width: 300px;
     }
 </style>
 <form action="{{ route('csv.export') }}" method="post">
@@ -102,6 +107,10 @@
                 <input class="js-add-option-value" type="text" name="block" placeholder="{{ __('追加する選択肢名を入力してください') }}" />
                 <div class="btn btn-secondary js-add-option">選択肢を追加</div>
             </div>
+            <div class="btn btn-primary js-save-layout">現在のレイアウトを保存する</div>
+            <div class="custom-select-box">
+                <div class="btn btn-primary js-read-layout">レイアウトを読み込む</div>
+            </div>
         </div>
         <div class="list-group-wrap js-sortable-elms-wrap">
             <div class="js-sortable-elms list-group-items">
@@ -141,36 +150,42 @@
             wrap.style.width = form.clientWidth + 'px'
         }
 
+        function addColumn()
+        {
+            var node = copyTargetGroup.cloneNode(true)
+            sortableElms.append(node)
+
+            var loopNumber = 1
+            var targetGroups = document.querySelectorAll('.js-copy-target-group')
+            if (targetGroups.length) {
+                sortableElms.style.width = (targetGroups.length * groupWidthNum) + 'px'
+                targetGroups.forEach(function (elm) {
+                    elm.dataset.column = loopNumber
+                    var col = elm.querySelector('.js-delete-column')
+                    col.dataset.deleteColumn = loopNumber
+                    deleteColumnMethod(col)
+
+                    loopNumber++
+                })
+            }
+
+            return node
+        }
+
         var copyTargetGroup = document.querySelector('.js-copy-target-group')
         var addButton = document.querySelector('.js-add-column')
         if (addButton && copyTargetGroup) {
             var groupWidthNum = copyTargetGroup.clientWidth
             copyTargetGroup.style.width = groupWidthNum + 'px'
             addButton.addEventListener('click', function () {
-                var node = copyTargetGroup.cloneNode(true)
-                sortableElms.append(node)
-
-                var loopNumber = 1
-                var targetGroups = document.querySelectorAll('.js-copy-target-group')
-                if (targetGroups.length) {
-                    sortableElms.style.width = (targetGroups.length * groupWidthNum) + 'px'
-                    targetGroups.forEach(function (elm) {
-                        elm.dataset.column = loopNumber
-                        var col = elm.querySelector('.js-delete-column')
-                        col.dataset.deleteColumn = loopNumber
-                        deleteColumnMethod(col)
-
-                        loopNumber++
-                    })
-                }
+                addColumn()
             })
         }
-        var addOption = document.querySelector('.js-add-option')
-        var addOptionValue = document.querySelector('.js-add-option-value')
-        if (addOption && addOptionValue) {
-            addOption.addEventListener('click', function () {
-                var addOptionValue = document.querySelector('.js-add-option-value')
-                if (!addOptionValue.value) {
+
+        function addOption(addOptionValue)
+        {
+            return new Promise(function () {
+                if (!addOptionValue) {
                     alert('{{ __('入力値がありません') }}')
                     return;
                 }
@@ -178,15 +193,15 @@
                 var selectBoxes = document.querySelectorAll('.js-select-box')
                 if (selectBoxes) {
                     var option = document.createElement('option')
-                    option.text = addOptionValue.value
-                    option.value = addOptionValue.value
+                    option.text = addOptionValue
+                    option.value = addOptionValue
 
                     var checker = true
                     var allow = true;
                     selectBoxes.forEach(function (elm) {
                         if (true === checker) {
                             Array.from(elm.options).forEach(function (childEl) {
-                                if (true === checker && addOptionValue.value === childEl.value) {
+                                if (true === checker && addOptionValue === childEl.value) {
                                     alert('{{ __('既に存在する値です ') }}');
                                     checker = false
                                     allow = false
@@ -196,6 +211,15 @@
                         if (true === allow) elm.append(option.cloneNode(true))
                     })
                 }
+            })
+        }
+
+        var addOptionButton = document.querySelector('.js-add-option')
+        var addOptionValue = document.querySelector('.js-add-option-value')
+        if (addOptionButton && addOptionValue) {
+            addOptionButton.addEventListener('click', function () {
+                var addOptionValue = document.querySelector('.js-add-option-value')
+                addOption(addOptionValue.value)
             })
         }
         var deleteButton = document.querySelector('.js-delete-column')
@@ -256,6 +280,157 @@
                 Request.open('POST', form.action)
                 Request.send(new FormData(form))
             })
+        }
+
+        var saveLayout = document.querySelector('.js-save-layout')
+        if (saveLayout) {
+            saveLayout.addEventListener('click', function () {
+                Swal.fire({
+                    title: '{{ __('保存しますか？') }}',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    inputPlaceholder: '{{ __('レイアウト名を入力してください') }}',
+                    showCancelButton: true,
+                    confirmButtonText: '{{ __('保存') }}',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (layoutName) => {
+                        if (!layoutName) {
+                            Swal.showValidationMessage(
+                                `{{ __('この項目は入力必須です') }}`
+                            )
+                            return;
+                        }
+                        var ar = new Array()
+                        var selects = document.querySelectorAll('select[name="select[]"]')
+                        selects.forEach(function (select) {
+                            ar.push(select.value)
+                        })
+
+                        var obj = {layout_name: layoutName, data: ar};
+                        var method = "POST";
+                        var body = JSON.stringify(obj);
+                        var headers = {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        };
+                        return fetch(`{{ route('csv_template.save') }}`, {method, headers, body})
+                            .then(response => {
+                                if (!response.ok) {
+                                    Swal.showValidationMessage(
+                                        `{{ __('エラーです。既にあるレイアウト名ではありませんか？') }}`
+                                    )
+                                }
+                                return response.json()
+                            })
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: `{{ __('保存しました') }}`
+                        })
+                    }
+                })
+            })
+        }
+
+        if (copyTargetGroup && addButton) {
+            var readLayout = document.querySelector('.js-read-layout')
+            if (readLayout) {
+                readLayout.addEventListener('click', function () {
+                    Swal.fire({
+                        title: '{{ __('Please wait.') }}',
+                        html: '',
+                        timerProgressBar: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    })
+
+                    fetch(`{{ route('csv_template.list') }}`)
+                        .then(response => {
+                            return response.json()
+                        })
+                        .then(result => {
+                            var inputOptions = {}
+                            result.forEach(function (data) {
+                                inputOptions[data['id']] = data['name']
+                            })
+                            Swal.close()
+                            Swal.fire({
+                                title: '{{ __('読み込むレイアウトを選択してください') }}',
+                                input: 'select',
+                                inputOptions: inputOptions,
+                                inputPlaceholder: '{{ __('選択してください') }}',
+                                showCancelButton: true,
+                                inputValidator: function (value) {
+                                    return new Promise(function (resolve, reject) {
+                                        if (value !== '') {
+                                            resolve();
+                                        } else {
+                                            resolve('{{ __('選択してください') }}');
+                                        }
+                                    });
+                                }
+                            }).then(function (selected) {
+                                if (selected.isConfirmed) {
+                                    Swal.fire({
+                                        title: '{{ __('Loading Now.') }}',
+                                        html: '',
+                                        timerProgressBar: false,
+                                        allowOutsideClick: false,
+                                        didOpen: () => {
+                                            Swal.showLoading()
+                                        }
+                                    })
+
+                                    var dummyApiRoute = '{{ route('csv_template.value', ['key' => '0']) }}'
+                                    var apiRoute = dummyApiRoute.slice(0, -1)
+
+                                    return fetch(apiRoute + selected.value).then(function (response) {
+                                        if (!response.ok) {
+                                            Swal.showValidationMessage(
+                                                `{{ __('エラーが起きました！') }}`
+                                            )
+                                        }
+                                        return response.json()
+                                    }).then(function (data) {
+                                        return new Promise(function (resolve, reject) {
+                                            var firstGroups = document.querySelectorAll('.js-copy-target-group')
+                                            data.values.forEach(function (value) {
+                                                var n = addColumn()
+                                                if (n) {
+                                                    var s = n.querySelector('select')
+                                                    if (s) {
+                                                        var selectBox = document.querySelector('.js-select-box')
+                                                        if (selectBox) {
+                                                            var checker = Array.from(selectBox.options).filter(function (option) {
+                                                                return option.value.includes(value)
+                                                            })
+                                                            if (0 === checker.length) addOption(value)
+                                                        }
+
+                                                        s.value = value
+                                                    }
+                                                }
+                                            })
+                                            firstGroups.forEach(function (elm) {
+                                                elm.remove()
+                                            })
+
+                                            resolve();
+                                        });
+                                    }).then(function () {
+                                        Swal.close()
+                                    })
+                                }
+                            });
+                        })
+                })
+            }
         }
     })
 </script>
