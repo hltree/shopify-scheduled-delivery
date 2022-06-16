@@ -1,4 +1,4 @@
-# 日時指定配達ぷらす（仮）
+# Shopify Custom CSV Export App
 
 名前は適当につけました。お察しください。
 
