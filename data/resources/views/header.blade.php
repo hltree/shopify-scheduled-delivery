@@ -55,7 +55,7 @@
     </style>
 </head>
 <body class="antialiased">
-<div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
+<div class="relative flex items-top justify-center min-h-screen bg-gray-100 sm:items-center py-4 sm:pt-0">
     <nav class="float-nav">
         <ul>
             <li><a href="{{ route('home') }}" class="home">家</a></li>
