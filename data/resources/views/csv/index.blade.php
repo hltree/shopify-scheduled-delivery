@@ -8,13 +8,14 @@
         border-top-left-radius: 0.25rem;
         border-top-right-radius: 0.25rem;
     }
+
     .list-group-item {
         position: relative;
         display: block;
         padding: 0.75rem 1.25rem;
         margin-bottom: -1px;
         background-color: #fff;
-        border: 1px solid rgba(0,0,0,.125);
+        border: 1px solid rgba(0, 0, 0, .125);
     }
 
     .list-group-items {
@@ -66,6 +67,10 @@
     .swal2-input {
         width: 300px;
     }
+
+    .data-link-section {
+        margin-top: 20px;
+    }
 </style>
 <form action="{{ route('csv.export') }}" method="post">
     @csrf
@@ -104,7 +109,8 @@
         <div class="buttons">
             <div class="btn btn-primary js-add-column">列を追加</div>
             <div class="custom-select-box">
-                <input class="js-add-option-value" type="text" name="block" placeholder="{{ __('追加する選択肢名を入力してください') }}" />
+                <input class="js-add-option-value" type="text" name="block"
+                       placeholder="{{ __('追加する選択肢名を入力してください') }}"/>
                 <div class="btn btn-secondary js-add-option">選択肢を追加</div>
             </div>
             <div class="btn btn-primary js-save-layout">現在のレイアウトを保存する</div>
@@ -128,10 +134,36 @@
                 </div>
             </div>
         </div>
-        <div class="document-link">各データの説明は<a href="{{ route('csv.document') }}" target="_blank">データ構造ドキュメント</a>をご確認ください</div>
+        <div class="document-link">各データの説明は<a href="{{ route('csv.document') }}" target="_blank">データ構造ドキュメント</a>をご確認ください
+        </div>
     </fieldset>
     <fieldset>
-        <input type="submit" name="submitter" value="ダウンロードする" class="btn btn-outline-primary" />
+        <legend>連結するデータを設定できます</legend>
+        <div>
+            @php
+                $addEmptyValueData = ['null' => __('設定なし')];
+                $addEmptyValueData = array_merge($addEmptyValueData, $ALLOW_READ_PROPERTIES);
+            @endphp
+            @for ($i = 1; $i <= 10; $i++)
+                <div>
+                    @for ($y = 1; $y <= 3; $y++)
+                        <select name="link-data-setting-{{ $i }}[]">
+                            @foreach($addEmptyValueData as $pkey => $array)
+                                <option value="{{ $pkey }}">{{ $pkey }}</option>
+                            @endforeach
+                        </select>
+                    @endfor
+                </div>
+            @endfor
+        </div>
+        <p>
+            ※ 親はCSV出力項目として設定されていなければなりません。（親に子データが連結する形で出力されます）<br>
+            ※ 最大10組まで設定できます。<br>
+            ※ 子の設定数は最大3です。
+        </p>
+    </fieldset>
+    <fieldset>
+        <input type="submit" name="submitter" value="ダウンロードする" class="btn btn-outline-primary"/>
     </fieldset>
 </form>
 <script src="//cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -150,8 +182,7 @@
             wrap.style.width = form.clientWidth + 'px'
         }
 
-        function addColumn()
-        {
+        function addColumn() {
             var node = copyTargetGroup.cloneNode(true)
             sortableElms.append(node)
 
@@ -182,8 +213,7 @@
             })
         }
 
-        function addOption(addOptionValue)
-        {
+        function addOption(addOptionValue) {
             return new Promise(function () {
                 if (!addOptionValue) {
                     alert('{{ __('入力値がありません') }}')
@@ -225,8 +255,7 @@
         var deleteButton = document.querySelector('.js-delete-column')
         deleteColumnMethod(deleteButton)
 
-        function deleteColumnMethod(elm)
-        {
+        function deleteColumnMethod(elm) {
             elm.addEventListener('click', function (e) {
                 document.querySelector('*[data-column="' + elm.dataset.deleteColumn + '"]').remove()
             })

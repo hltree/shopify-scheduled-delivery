@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +19,8 @@ class CsvController extends Controller
         'false' => '含めない',
         'true' => '含める'
     ];
+
+    private const DATE_FORMAT = 'Ymd';
 
     private const ALLOW_READ_PROPERTIES = [
 
@@ -52,6 +55,10 @@ class CsvController extends Controller
             'return' => '注文時に入力したメールアドレス',
             'description' => '注文時に入力したメールアドレス'
         ],
+        'created_at' => [
+            'return' => '注文日（Ymdの形式で出力する)',
+            'description' => '注文日'
+        ],
         'current_subtotal_price' => [
             'return' => '税抜きの注文合計料金',
             'description' => '注文の合計料金（税抜き）'
@@ -80,6 +87,10 @@ class CsvController extends Controller
             'return' => '注文者の名前',
             'description' => '注文者の名前'
         ],
+        'shipping_address-last_name' => [
+            'return' => '注文者の苗字',
+            'description' => '注文者の苗字'
+        ],
         'shipping_address-address1' => [
             'return' => '注文者の住所１',
             'description' => '注文者の住所１'
@@ -104,10 +115,6 @@ class CsvController extends Controller
             'return' => '注文者の国名',
             'description' => '注文者の国名'
         ],
-        'shipping_address-last_name' => [
-            'return' => '注文者の苗字',
-            'description' => '注文者の苗字'
-        ],
         'shipping_address-company' => [
             'return' => '注文者の会社名など',
             'description' => '注文者の会社名など'
@@ -115,6 +122,10 @@ class CsvController extends Controller
         'billing_address-first_name' => [
             'return' => '発送先の名前',
             'description' => '発送先の名前（ない場合はshipping_address-first_nameが入ります）'
+        ],
+        'billing_address-last_name' => [
+            'return' => '配送先の苗字',
+            'description' => '配送先の苗字（ない場合はshipping_address-last_nameが入ります）'
         ],
         'billing_address-address1' => [
             'return' => '配送先の住所１',
@@ -139,10 +150,6 @@ class CsvController extends Controller
         'billing_address-country' => [
             'return' => '配送先の国名',
             'description' => '配送先の国名（ない場合はshipping_address-countryが入ります）'
-        ],
-        'billing_address-last_name' => [
-            'return' => '配送先の苗字',
-            'description' => '配送先の苗字（ない場合はshipping_address-last_nameが入ります）'
         ],
         'billing_address-company' => [
             'return' => '配送先の会社名など',
@@ -194,6 +201,7 @@ class CsvController extends Controller
 
     public function export(Request $request)
     {
+//        dd($this->getOrders($request->all()));
         $Validator = $this->validator($request->all());
         if ($Validator->fails()) {
             return new JsonResponse([
@@ -305,7 +313,11 @@ class CsvController extends Controller
                             } else if (!isset($order[$name])) {
                                 $value = __('このプロパティは存在しません');
                             } else {
-                                $value = $order[$name];
+                                if ('created_at' === $name) {
+                                    $value = Carbon::create($order[$name])->format(self::DATE_FORMAT);
+                                } else {
+                                    $value = $order[$name];
+                                }
                             }
                         } else {
                             $keep = $value;
